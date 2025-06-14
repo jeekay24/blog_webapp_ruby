@@ -2,40 +2,29 @@
 default: &default
   adapter: postgresql
   encoding: unicode
-  # For details on connection pooling, see Rails configuration guide
-  # https://guides.rubyonrails.org/configuring.html#database-pooling
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-
+  timeout: 5000
 
 development:
   <<: *default
-  database: blog_app_development
-  username: rgk24
-  password: password123
-  host: localhost
+  database: <%= ENV['DATABASE_NAME'] || 'blog_app_development' %>
+  username: <%= ENV['DATABASE_USER'] || 'rgk24' %>
+  password: <%= ENV['DATABASE_PASSWORD'] %>
+  host: <%= ENV['DATABASE_HOST'] || 'localhost' %>
+  port: <%= ENV['DATABASE_PORT'] || 5432 %>
 
 test:
   <<: *default
-  database: blog_app_test
-  username: rgk24
-  password: password123
-  host: localhost
+  database: <%= ENV['DATABASE_NAME'] || 'blog_app_test' %>
+  username: <%= ENV['DATABASE_USER'] || 'rgk24' %>
+  password: <%= ENV['DATABASE_PASSWORD'] %>
+  host: <%= ENV['DATABASE_HOST'] || 'localhost' %>
+  port: <%= ENV['DATABASE_PORT'] || 5432 %>
 
 production:
-  primary: &primary_production
-    <<: *default
-    database: blog_app_production
-    username: blog_app
-    password: <%= ENV["BLOG_APP_DATABASE_PASSWORD"] %>
-  cache:
-    <<: *primary_production
-    database: blog_app_production_cache
-    migrations_paths: db/cache_migrate
-  queue:
-    <<: *primary_production
-    database: blog_app_production_queue
-    migrations_paths: db/queue_migrate
-  cable:
-    <<: *primary_production
-    database: blog_app_production_cable
-    migrations_paths: db/cable_migrate
+  <<: *default
+  database: <%= ENV['DATABASE_NAME'] || 'blog_app_production' %>
+  username: <%= ENV['DATABASE_USER'] %>
+  password: <%= ENV['DATABASE_PASSWORD'] %>
+  host: <%= ENV['DATABASE_HOST'] %>
+  port: <%= ENV['DATABASE_PORT'] || 5432 %>

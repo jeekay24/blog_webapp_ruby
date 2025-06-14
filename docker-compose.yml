@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_USER: ${DATABASE_USER:-rgk24}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: rgk24
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    # ports:
+    #   - "5432:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DATABASE_USER:-rgk24} -d rgk24" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  web:
+    build: .
+    command: bash -c "rm -f tmp/pids/server.pid && mkdir -p log && touch log/development.log && chmod 666 log/development.log && bundle exec rails db:create db:migrate && rails s -b 0.0.0.0"
+    volumes:
+      - .:/myapp
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_HOST: db
+      DATABASE_USER: ${DATABASE_USER:-rgk24}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_NAME: ${DATABASE_NAME:-blog_app_development}
+      DATABASE_PORT: 5432
+      RAILS_ENV: ${RAILS_ENV:-development}
+    restart: unless-stopped
+
+volumes:
+  db_data:

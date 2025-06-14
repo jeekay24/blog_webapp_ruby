@@ -1,11 +1,315 @@
-<% content_for :title, "New post" %>
+<!-- app/views/posts/new.html.erb and app/views/posts/edit.html.erb -->
+<div class="form-container">
+  <nav class="breadcrumb">
+    <%= link_to '← Back to Posts', posts_path, class: 'breadcrumb-link' %>
+  </nav>
 
-<h1>New post</h1>
+  <div class="form-wrapper">
+    <header class="form-header">
+      <h1 class="form-title">
+        <i class="icon"><%= @post.persisted? ? '✏️' : '✨' %></i>
+        <%= @post.persisted? ? 'Edit Post' : 'Create New Post' %>
+      </h1>
+      <p class="form-subtitle">
+        <%= @post.persisted? ? 'Update your thoughts' : 'Share your ideas with the world' %>
+      </p>
+    </header>
 
-<%= render "form", post: @post %>
+    <%= form_with model: @post, local: true, class: 'post-form' do |form| %>
+      <% if @post.errors.any? %>
+        <div class="error-panel">
+          <div class="error-header">
+            <i class="icon">⚠️</i>
+            <strong>Oops! We found <%= pluralize(@post.errors.count, "error") %>:</strong>
+          </div>
+          <ul class="error-list">
+            <% @post.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
 
-<br>
+      <div class="form-group">
+        <%= form.label :title, class: 'form-label' do %>
+          <i class="icon">📝</i>
+          Post Title
+        <% end %>
+        <%= form.text_field :title, 
+            class: 'form-input title-input', 
+            placeholder: 'Enter an engaging title...',
+            maxlength: 100 %>
+        <div class="char-counter">
+          <span class="current-count">0</span>/<span class="max-count">100</span>
+        </div>
+      </div>
 
-<div>
-  <%= link_to "Back to posts", posts_path %>
+      <div class="form-group">
+        <%= form.label :body, class: 'form-label' do %>
+          <i class="icon">📄</i>
+          Post Content
+        <% end %>
+        <%= form.text_area :body, 
+            class: 'form-input body-input', 
+            placeholder: 'Write your amazing content here...',
+            rows: 12 %>
+        <div class="writing-stats">
+          <span class="word-count">0 words</span>
+          <span class="char-count">0 characters</span>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <%= form.submit(@post.persisted? ? 'Update Post' : 'Publish Post', 
+                       class: 'btn btn-primary submit-btn') %>
+        
+        <%= link_to 'Cancel', 
+            @post.persisted? ? post_path(@post) : posts_path, 
+            class: 'btn btn-secondary' %>
+        
+        <% if @post.persisted? %>
+          <%= link_to 'View Post', post_path(@post), class: 'btn btn-outline' %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
 </div>
+
+<style>
+  .form-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+  }
+
+  .breadcrumb {
+    margin-bottom: 30px;
+  }
+
+  .breadcrumb-link {
+    color: rgba(255,255,255,0.9);
+    text-decoration: none;
+    font-weight: 500;
+    padding: 10px 20px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+  }
+
+  .breadcrumb-link:hover {
+    background: rgba(255,255,255,0.2);
+    transform: translateX(-5px);
+  }
+
+  .form-wrapper {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    backdrop-filter: blur(10px);
+  }
+
+  .form-header {
+    text-align: center;
+    margin-bottom: 40px;
+    border-bottom: 2px solid #f7fafc;
+    padding-bottom: 30px;
+  }
+
+  .form-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin: 0 0 10px 0;
+  }
+
+  .form-title .icon {
+    margin-right: 10px;
+    font-size: 2rem;
+  }
+
+  .form-subtitle {
+    color: #666;
+    font-size: 1.1rem;
+    margin: 0;
+  }
+
+  .error-panel {
+    background: linear-gradient(135deg, #fed7d7, #feb2b2);
+    border: 2px solid #fc8181;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 30px;
+    color: #742a2a;
+  }
+
+  .error-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+  }
+
+  .error-list {
+    margin: 0;
+    padding-left: 25px;
+  }
+
+  .error-list li {
+    margin-bottom: 5px;
+    font-weight: 500;
+  }
+
+  .post-form {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .form-label {
+    font-weight: 600;
+    color: #2d3748;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .form-input {
+    padding: 15px 20px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: all 0.3s ease;
+    background: #fafafa;
+  }
+
+  .form-input:focus {
+    outline: none;
+    border-color: #667eea;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .title-input {
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+
+  .body-input {
+    font-size: 1rem;
+    line-height: 1.6;
+    resize: vertical;
+    min-height: 200px;
+    font-family: 'Georgia', serif;
+  }
+
+  .char-counter {
+    align-self: flex-end;
+    font-size: 0.85rem;
+    color: #666;
+    font-weight: 500;
+  }
+
+    .writing-stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: #4a5568;
+    font-weight: 500;
+    margin-top: 5px;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-start;
+    align-items: center;
+    margin-top: 20px;
+  }
+
+  .btn {
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+    border: none;
+  }
+
+  .btn-primary {
+    background-color: #667eea;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background-color: #5a67d8;
+    transform: translateY(-2px);
+  }
+
+  .btn-secondary {
+    background-color: #e2e8f0;
+    color: #2d3748;
+  }
+
+  .btn-secondary:hover {
+    background-color: #cbd5e0;
+    transform: translateY(-2px);
+  }
+
+  .btn-outline {
+    background-color: transparent;
+    border: 2px solid #667eea;
+    color: #667eea;
+  }
+
+  .btn-outline:hover {
+    background-color: #ebf4ff;
+    transform: translateY(-2px);
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const titleInput = document.querySelector('.title-input');
+    const titleCounter = document.querySelector('.char-counter .current-count');
+    const bodyInput = document.querySelector('.body-input');
+    const wordCount = document.querySelector('.writing-stats .word-count');
+    const charCount = document.querySelector('.writing-stats .char-count');
+
+    if (titleInput && titleCounter) {
+      const updateTitleCount = () => {
+        titleCounter.textContent = titleInput.value.length;
+      };
+      titleInput.addEventListener('input', updateTitleCount);
+      updateTitleCount();
+    }
+
+    if (bodyInput && wordCount && charCount) {
+      const updateBodyStats = () => {
+        const text = bodyInput.value.trim();
+        const words = text.length ? text.split(/\s+/).length : 0;
+        const chars = text.length;
+        wordCount.textContent = `${words} word${words !== 1 ? 's' : ''}`;
+        charCount.textContent = `${chars} character${chars !== 1 ? 's' : ''}`;
+      };
+      bodyInput.addEventListener('input', updateBodyStats);
+      updateBodyStats();
+    }
+  });
+</script>

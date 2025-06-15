@@ -23,5 +23,8 @@ module BlogApp
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    # Allow requests from rubyblog.local domain
+    config.hosts << "rubyblog.local"
   end
 end
